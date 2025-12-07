@@ -1,36 +1,34 @@
-# Symbolic Algebra Solver: A Verifier for Polynomial and Rational Identities
+# Symbolic Identity Verifier: Polynomial & Rational Algebra
 
-本项目是一个基于 C 语言实现的**符号代数求解器**，其核心功能是验证给定的多项式和有理式等式是否成立。项目通过将代数表达式解析为抽象语法树（AST），并转换为一种更适合计算和简化的数据结构，最终实现高效的代数等式验证。
+This is a C-based **Symbolic Algebra Solver** designed to verify the equivalence of polynomial and rational expressions. The project demonstrates core proficiency in **compiler principles** and **computational mathematics**.
 
-------
+---
 
-### 项目背景 (Project Background)
+## 🔬 Core Methodology
 
-在计算机科学中，符号计算（Symbolic Computation）是计算机代数和人工智能等领域的核心分支。本项目旨在通过实现一个基础的符号计算引擎，来深入理解代数表达式的计算机表示、简化算法以及恒等式验证的核心原理。
+The system's goal is to determine if an equation ($A=B$) is an identity by checking if the difference ($A-B$) simplifies to the **zero polynomial**.
 
-求解器接收包含多项式或有理式的等式作为输入，例如 `a*(a+b)^2 + b*(a+b)^2 = (a+b)^3`，并判断其是否为恒等式。
+### Key Concepts
 
-### 核心概念 (Core Concepts)
+| **Concept**          | **Description**                                                                                                                                                        |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Parsing & AST**    | Transforms string input into an Abstract Syntax Tree (AST) for structural representation.                                                                              |
+| **Canonicalization** | ASTs are converted into a custom **monomial/polynomial data structure** optimized for algebraic operations (e.g., term merging) and reduced to a unique standard form. |
+| **Identity Check**   | If canonical forms match (or the difference is zero), the identity is verified.                                                                                        |
 
-本项目主要基于以下两个核心概念：
+### Feature Summary
 
-1. **抽象语法树（AST）:** 项目使用词法分析器和语法分析器将输入的字符串表达式转换为一个树形结构，即抽象语法树（AST）。这个结构清晰地表示了表达式的层次关系，是进行进一步处理的基础。
-2. **多项式标准化（Canonicalization）:** 为了判断两个多项式是否相等，最有效的方法是将它们都化简到一种标准形式。例如，`a+b` 和 `b+a` 都应被简化为 `a+b`。本项目设计了一种新的数据结构来表示多项式，并实现了相应的算法，将 AST 转换为这种标准形式。如果两个表达式在标准化后完全一致，则它们是相等的。
+- **Polynomial Solver:** Verifies $A=B$ by checking if $A-B=0$.
+- **Rational Solver:** Verifies $p_1/p_2 = p_3/p_4$ by checking the polynomial identity $p_1 \cdot p_4 = p_3 \cdot p_2$. Includes zero-denominator detection.
+- **Error Handling:** Returns `-1` for invalid or non-algebraic expressions (e.g., trigonometric functions) and division by zero.
 
-### 功能实现 (Features)
+---
 
-- **语法解析:** 使用自定义的解析器将包含 `+`, `-`, `*`, `/`, `^` 等操作的代数表达式解析为AST。
-- **多项式数据结构:** 设计并实现了由系数和单项式组成的列表结构，以高效地处理多项式的加法、乘法和同类项合并。
-- **代数简化:** 实现了多项式化简算法，将复杂的表达式简化到标准形式。
-- **等式验证:**
-  - **多项式等式：** 通过将等式 `A = B` 转换为 `A - B = 0`，然后简化 `A-B` 并检查其是否为零多项式来判断等式成立。
-  - **有理式等式：** 将 `p1/p2 = p3/p4` 转换为 `p1*p4 = p3*p2` 的多项式等式，从而利用多项式求解器来判断。
+## ⚙️ Build & Execution
 
-### 编译与运行 (Build & Run)
+1. **Prerequisite:** GCC Compiler.
 
-1. **编译环境:** 需要 `gcc` 编译器。
-
-2. **编译指令:**
+2. **Compile:**
 
    Bash
 
@@ -38,7 +36,7 @@
    gcc -O3 -g ast.c hashtable.c pattern_match.c parser_api.c parser.c lexer.c polynomial.c solver.c test.c -o test.out
    ```
 
-3. **运行程序:**
+3. **Run Tests:**
 
    Bash
 
@@ -46,42 +44,22 @@
    ./test.out
    ```
 
-   运行后，程序将自动执行所有内置的测试用例。
+## 🛠️ Technical Challenges
 
-### 示例演示 (Example Usage)
+| **Challenge**                  | **Solution**                                                                                                                                                                       |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Inefficient Representation** | Designed a custom, list-based **polynomial** structure for fast term lookup and merging, overcoming AST limitations for algebraic computation.                                     |
+| **Floating-Point Precision**   | Used a small **EPSILON ($\epsilon$) tolerance** ($                                                                                                                                 |
+| **Zero-Denom Detection**       | Implemented a robust `poly_is_zero` function that **iterates all terms** to confirm all coefficients are zero, ensuring constant `0` is correctly identified as a zero polynomial. |
 
-考虑以下内置测试用例：
+---
 
-```
-(a+b)*(c+d) = a*c+b*c+a*d+b*d
-```
+## 📈 Future Work
 
-**运行输出:**
+- Algorithm optimization (e.g., Hash Table-based term merging).
+- Extension to support transcendental functions in a formal theory.
+- Formal complexity analysis and academic reporting.
 
-```
---- Polynomial Solver Tests ---
-...
-Testing Poly: (a+b)*(c+d) = a*c+b*c+a*d+b*d
-Result: 1 (Expected: 1)
-```
+## 📄 License
 
-**结果分析:** 程序将等式两侧的表达式分别解析并简化为标准形式。由于 `(a+b)*(c+d)` 展开后等于 `a*c+b*c+a*d+b*d`，它们的标准形式是相同的，因此程序正确地判断为相等 (`Result: 1`)。
-
-### 挑战与解决方案 (Challenges & Solutions)
-
-1. **多项式表示:** 语法树不适合直接进行代数运算。
-   - **解决方案:** 设计并实现了一个由系数和单项式组成的列表数据结构。通过将语法树转换为这种结构，我们能够高效地执行同类项合并和多项式乘法。
-2. **浮点数精度:** 在处理系数时，浮点数运算可能导致精度问题。
-   - **解决方案:** 在进行等于零的判断时，我们不直接使用 `== 0`，而是使用一个小的容差值（`EPSILON`），来判断系数是否足够接近零，以避免因精度问题导致的误判。
-3. **除零判断:** 在有理式求解器中，正确判断分母是否为零是一个关键挑战。
-   - **解决方案:** 实现了一个健壮的 `poly_is_zero` 函数，该函数不仅检查多项式是否为空，还会遍历所有项，以确保所有系数都为零，从而正确识别像常数 `0` 这样的零多项式。
-
-### 未来工作 (Future Work)
-
-- **性能优化:** 使用哈希表优化同类项的合并，以进一步提高大型多项式运算的性能。
-- **支持更多理论:** 扩展求解器，以支持如超越函数（`sin(x)`、`exp(x)`）的代数规则，或处理实数理论中的浮点数。
-- **学术化报告:** 撰写一份正式的学术报告，详细分析算法的复杂度、局限性，并与专业的符号计算系统进行对比。
-
-### 许可证 (License)
-
-本项目采用 [MIT License](https://www.google.com/search?q=LICENSE)。
+This project is licensed under the [MIT License](https://www.google.com/search?q=LICENSE).
